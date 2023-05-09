@@ -1,52 +1,42 @@
-# Code
+class Triple:
+    def __init__(self, op, arg1, arg2, result):
+        self.op = op
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.result = result
+
+    def __str__(self):
+        return f"{self.result} = {self.arg1} {self.op} {self.arg2}"
+
+
 class IntermediateCodeGenerator:
-    def __init__(self, code):
-        self.code = code
-        self.triples = []
+    def __init__(self):
+        self.code = []
+        self.temp_count = 0
 
-    def generate(self):
-        lines = self.code.split('\n')
-        for i, line in enumerate(lines):
-            if '=' in line:
-                left, right = line.split('=')
-                op = 'ASSIGN'
-                arg1 = right.strip()
-                arg2 = ''
-                result = left.strip()
-                self.triples.append((op, arg1, arg2, result))
-            elif '+' in line:
-                left, right = line.split('+')
-                op = 'ADD'
-                arg1 = left.strip()
-                arg2 = right.strip()
-                result = 't' + str(i+1)
-                self.triples.append((op, arg1, arg2, result))
-            elif '-' in line:
-                left, right = line.split('-')
-                op = 'SUBTRACT'
-                arg1 = left.strip()
-                arg2 = right.strip()
-                result = 't' + str(i+1)
-                self.triples.append((op, arg1, arg2, result))
-        return self.triples
+    def new_temp(self):
+        temp = f"t{self.temp_count}"
+        self.temp_count += 1
+        return temp
 
-# Example usage
-code = '''
-x = 5;
-y = 3 + x;
-z = y - 2;
-'''
+    def gen_code(self, op, arg1, arg2=None):
+        result = self.new_temp()
+        triple = Triple(op, arg1, arg2, result)
+        self.code.append(triple)
+        return result
 
-generator = IntermediateCodeGenerator(code)
-triples = generator.generate()
-for triple in triples:
-    print(triple)
+    def print_code(self):
+        for triple in self.code:
+            print(triple)
+
+    def example_code(self):
+        # Example code: a = b + c * d
+        a = self.gen_code("*", "c", "d")
+        b = self.gen_code("+", "b", a)
+        self.gen_code("=", b, "a")
 
 
-
-# # Note:
-# This program implements an intermediate code generator using 3-address code using triples. The IntermediateCodeGenerator class has a generate() method which generates the intermediate code in the form of triples.
-
-# The program takes an input code as a string and creates an instance of the IntermediateCodeGenerator class. It then calls the generate() method to generate the intermediate code using 3-address code using triples and stores the result in triples.
-
-# Finally, the program prints out the generated triples. The example code provided demonstrates how the program can be used to generate the intermediate code for a simple code snippet.
+# Usage
+generator = IntermediateCodeGenerator()
+generator.example_code()
+generator.print_code()
